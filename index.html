@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GigShield — Parametric Insurance for Grocery Delivery Partners</title>
+  <meta name="description" content="AI-powered parametric insurance protecting grocery and Q-Commerce delivery partners from income loss due to weather, heat, and air quality disruptions.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-logo">G</div>
+      <div>
+        <div class="navbar-title">GigShield</div>
+        <div class="navbar-subtitle">Parametric Insurance</div>
+      </div>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#" data-section="dashboard" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+      <li><a href="#" data-section="persona"><span class="nav-icon">👤</span> Persona</a></li>
+      <li><a href="#" data-section="triggers"><span class="nav-icon">⚡</span> Triggers</a></li>
+      <li><a href="#" data-section="financial"><span class="nav-icon">💰</span> Financial</a></li>
+      <li><a href="#" data-section="ai"><span class="nav-icon">🤖</span> AI Insights</a></li>
+    </ul>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div class="section active" id="section-dashboard">
+      <div class="section-header">
+        <h1 class="section-title">Live Monitoring Dashboard</h1>
+        <p class="section-desc">Real-time environmental triggers and automated payout monitoring for grocery delivery partners across India.</p>
+      </div>
+
+      <!-- City Selector -->
+      <div class="city-pills" id="cityPills"></div>
+
+      <!-- Stats Row -->
+      <div class="grid-4" id="dashboardStats" style="margin-bottom:1.5rem;">
+        <div class="stat-card">
+          <div class="stat-label">Active Partners</div>
+          <div class="stat-value" id="statPartners">2,847</div>
+          <div class="stat-change positive">↑ 12% vs last week</div>
+          <div class="stat-icon">👥</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Current Triggers</div>
+          <div class="stat-value" id="statTriggers">0</div>
+          <div class="stat-change" id="triggerStatus">All clear</div>
+          <div class="stat-icon">⚡</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Today's Payouts</div>
+          <div class="stat-value" id="statPayouts">₹0</div>
+          <div class="stat-change" id="payoutCount">0 auto-payouts</div>
+          <div class="stat-icon">💸</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pool Balance</div>
+          <div class="stat-value" id="statPool">₹4.2L</div>
+          <div class="stat-change positive">Healthy</div>
+          <div class="stat-icon">🏦</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌧️ Weather & AQI (7-Day)</div>
+            <span class="card-badge badge-info"><span class="live-dot"></span> Live</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="weatherChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📉 Income Impact Analysis</div>
+            <span class="card-badge badge-warning">This Week</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="incomeChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Alerts & Recent Payouts -->
+      <div class="grid-2-1">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🚨 Active Trigger Alerts</div>
+            <span class="card-badge badge-danger" id="alertCount">0 Active</span>
+          </div>
+          <div id="alertsList">
+            <p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:2rem;">
+              No active triggers right now. Click "Simulate Disruption" to test the trigger engine.
+            </p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💳 Recent Payouts</div>
+          </div>
+          <div id="recentPayoutsList"></div>
+        </div>
+      </div>
+
+      <!-- Simulation Panel -->
+      <div class="sim-panel" id="simPanel">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h3 style="font-size:1rem; font-weight:600; margin-bottom:0.25rem;">⚡ Disruption Simulator</h3>
+            <p style="color:var(--text-muted); font-size:0.8rem;">Simulate environmental disruptions to demonstrate automated parametric payouts</p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-danger" onclick="simulateDisruption('monsoon')">🌧️ Monsoon</button>
+            <button class="btn btn-danger" onclick="simulateDisruption('heatwave')">🌡️ Heatwave</button>
+            <button class="btn btn-danger" onclick="simulateDisruption('pollution')">💨 AQI Spike</button>
+            <button class="btn btn-outline" onclick="resetSimulation()">↺ Reset</button>
+          </div>
+        </div>
+        <div class="sim-result" id="simResult"></div>
+      </div>
+    </div>
+
+    <!-- ==================== PERSONA ==================== -->
+    <div class="section" id="section-persona">
+      <div class="section-header">
+        <h1 class="section-title">Grocery/Q-Commerce Persona</h1>
+        <p class="section-desc">Understanding the vulnerability and workflow of quick-commerce delivery partners.</p>
+      </div>
+
+      <!-- Problem Statement -->
+      <div class="card" style="margin-bottom:1.5rem; border-left: 3px solid var(--accent-danger);">
+        <div class="card-header">
+          <div class="card-title">🎯 Problem Statement</div>
+          <span class="card-badge badge-danger">Critical Gap</span>
+        </div>
+        <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.7;">
+          India's <strong style="color:var(--text-primary)">8+ million gig delivery workers</strong> in grocery and Q-Commerce face 
+          <strong style="color:var(--accent-danger)">30-60% income loss</strong> during environmental disruptions. 
+          Heavy monsoon rains, extreme heat waves (45°C+), and hazardous air quality (AQI 300+) directly reduce order volumes, 
+          delivery capacity, and platform activity — yet <strong style="color:var(--accent-warning)">zero insurance products</strong> 
+          exist to protect their daily earnings. Traditional insurance requires manual claims, takes weeks to process, and doesn't 
+          cover income loss. GigShield solves this with <strong style="color:var(--accent-success)">instant, automated parametric payouts</strong> 
+          triggered by real-time environmental data.
+        </p>
+      </div>
+
+      <!-- Persona Profile -->
+      <div class="persona-hero">
+        <div class="persona-avatar">🛵</div>
+        <div class="persona-info">
+          <h2>Grocery & Q-Commerce Delivery Partner</h2>
+          <p>Platforms: Zepto, Blinkit, Swiggy Instamart, BigBasket, JioMart</p>
+          <div class="persona-tags">
+            <span class="persona-tag">10-minute delivery</span>
+            <span class="persona-tag">Hyper-local</span>
+            <span class="persona-tag">Weather-dependent</span>
+            <span class="persona-tag">Gig Economy</span>
+            <span class="persona-tag">No safety net</span>
+            <span class="persona-tag">Daily wage</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <!-- Typical Day -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📅 A Typical Day</div>
+          </div>
+          <div style="font-size:0.85rem; color:var(--text-secondary);">
+            <div style="padding:0.5rem 0; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between;">
+              <span>⏰ 8:00 AM — Goes online on platform</span>
+              <span style="color:var(--text-muted)">Start</span>
+            </div>
+            <div style="padding:0.5rem 0; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between;">
+              <span>🏪 9:00 AM — Reaches dark store / warehouse</span>
+              <span style="color:var(--text-muted)">Setup</span>
+            </div>
+            <div style="padding:0.5rem 0; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between;">
+              <span>📦 9:30 AM - 2:00 PM — Morning deliveries (8-12 orders)</span>
+              <span style="color:var(--accent-success)">Peak 1</span>
+            </div>
+            <div style="padding:0.5rem 0; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between;">
+              <span>😴 2:00 PM - 5:00 PM — Slow period / rest</span>
+              <span style="color:var(--text-muted)">Low</span>
+            </div>
+            <div style="padding:0.5rem 0; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between;">
+              <span>🌆 5:00 PM - 10:00 PM — Evening deliveries (8-14 orders)</span>
+              <span style="color:var(--accent-success)">Peak 2</span>
+            </div>
+            <div style="padding:0.5rem 0; display:flex; justify-content:space-between;">
+              <span>🏠 10:00 PM — Goes offline, daily income: ₹700-900</span>
+              <span style="color:var(--accent-warning)">End</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vulnerability Factors -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚠️ Vulnerability Factors</div>
+          </div>
+          <div style="font-size:0.85rem;">
+            <div style="padding:0.75rem; margin-bottom:0.5rem; border-radius:var(--radius-sm); background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.1);">
+              <strong style="color:var(--accent-danger);">🌧️ Monsoon Rains</strong>
+              <p style="color:var(--text-secondary); margin-top:0.25rem;">Heavy rain (>10mm/hr) makes roads dangerous, reduces visibility, damages products. Order volume drops 40-60%. Partner earns ₹300-400 instead of ₹800+.</p>
+            </div>
+            <div style="padding:0.75rem; margin-bottom:0.5rem; border-radius:var(--radius-sm); background:rgba(245,158,11,0.05); border:1px solid rgba(245,158,11,0.1);">
+              <strong style="color:var(--accent-warning);">🌡️ Extreme Heat</strong>
+              <p style="color:var(--text-secondary); margin-top:0.25rem;">Heat index above 45°C causes dehydration, heat stroke risk. Partners forced to take breaks, reducing delivery capacity by 35-50%.</p>
+            </div>
+            <div style="padding:0.75rem; border-radius:var(--radius-sm); background:rgba(99,102,241,0.05); border:1px solid rgba(99,102,241,0.1);">
+              <strong style="color:var(--accent-primary-light);">💨 Poor Air Quality</strong>
+              <p style="color:var(--text-secondary); margin-top:0.25rem;">AQI above 300 causes respiratory issues. Prolonged outdoor exposure is hazardous. Partners reduce working hours, losing 30-40% income.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sample Partners -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👥 Sample Delivery Partners (Enrolled)</div>
+          <span class="card-badge badge-success">6 Active</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>City</th>
+              <th>Platform</th>
+              <th>Avg Daily Income</th>
+              <th>Avg Orders/Day</th>
+              <th>Active Days/Week</th>
+            </tr>
+          </thead>
+          <tbody id="partnerTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== TRIGGER ENGINE ==================== -->
+    <div class="section" id="section-triggers">
+      <div class="section-header">
+        <h1 class="section-title">Parametric Trigger Engine</h1>
+        <p class="section-desc">Automated trigger-based payouts — no manual claims, no paperwork, instant settlement.</p>
+      </div>
+
+      <!-- How It Works -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header">
+          <div class="card-title">🔄 How Parametric Insurance Works</div>
+          <span class="card-badge badge-primary">Automated Flow</span>
+        </div>
+        <div class="flow-container">
+          <div class="flow-step active">
+            <div class="flow-icon">🌦️</div>
+            <div class="flow-label">Weather/AQI APIs stream data</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">📡</div>
+            <div class="flow-label">Real-time monitoring 24/7</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">⚡</div>
+            <div class="flow-label">Threshold breached? Trigger fires!</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">✅</div>
+            <div class="flow-label">Verify partner was online</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">💸</div>
+            <div class="flow-label">Instant automated payout</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">📱</div>
+            <div class="flow-label">Partner notified via SMS/App</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trigger Configurations -->
+      <h3 style="font-size:1rem; font-weight:600; margin-bottom:1rem; color:var(--text-secondary);">Trigger Thresholds & Payout Rules</h3>
+      <div class="grid-4" style="margin-bottom:1.5rem;" id="triggerCards"></div>
+
+      <!-- Live Trigger Monitor -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Trigger History (7 Days)</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="triggerHistoryChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 Payout Log</div>
+            <span class="card-badge badge-success">Auto-processed</span>
+          </div>
+          <div id="payoutLog" style="max-height:280px; overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FINANCIAL MODEL ==================== -->
+    <div class="section" id="section-financial">
+      <div class="section-header">
+        <h1 class="section-title">Weekly Financial Model</h1>
+        <p class="section-desc">Premium pricing, coverage pool, and payout structure tailored for gig worker weekly pay cycles.</p>
+      </div>
+
+      <!-- Premium Calculator -->
+      <div class="grid-3" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="gauge-container">
+            <div class="gauge-value" id="premiumValue">₹89</div>
+            <div class="gauge-label">Weekly Premium</div>
+          </div>
+          <div style="text-align:center; margin-top:0.5rem;">
+            <label style="color:var(--text-muted); font-size:0.75rem; display:block; margin-bottom:0.5rem;">Select City</label>
+            <select class="form-select" id="citySelect" onchange="updateFinancialModel()" style="width:100%;">
+            </select>
+          </div>
+        </div>
+        <div class="card">
+          <div class="gauge-container">
+            <div class="gauge-value" id="poolValue">₹0</div>
+            <div class="gauge-label">Weekly Pool Size</div>
+          </div>
+          <div style="text-align:center; margin-top:0.5rem; color:var(--text-muted); font-size:0.8rem;">
+            Premium income + 30% platform co-pay
+          </div>
+        </div>
+        <div class="card">
+          <div class="gauge-container">
+            <div class="gauge-value">₹2,000</div>
+            <div class="gauge-label">Max Weekly Payout</div>
+          </div>
+          <div style="text-align:center; margin-top:0.5rem; color:var(--text-muted); font-size:0.8rem;">
+            Per delivery partner cap
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Breakdown -->
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Premium Tiers by City Risk</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>City</th>
+                <th>Risk Tier</th>
+                <th>Weekly Premium</th>
+                <th>Daily Cost</th>
+                <th>Claim Rate</th>
+              </tr>
+            </thead>
+            <tbody id="premiumTable"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💰 Payout Structure</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Trigger</th>
+                <th>Payout %</th>
+                <th>Max Payout (₹850 avg)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>🌧️ Heavy Rain (>10mm/hr)</td>
+                <td><span class="card-badge badge-warning">60%</span></td>
+                <td style="color:var(--accent-success); font-weight:600;">₹510</td>
+              </tr>
+              <tr>
+                <td>🌡️ Extreme Heat (>45°C HI)</td>
+                <td><span class="card-badge badge-warning">50%</span></td>
+                <td style="color:var(--accent-success); font-weight:600;">₹425</td>
+              </tr>
+              <tr>
+                <td>💨 Hazardous AQI (>300)</td>
+                <td><span class="card-badge badge-info">40%</span></td>
+                <td style="color:var(--accent-success); font-weight:600;">₹340</td>
+              </tr>
+              <tr>
+                <td>⚠️ Combined (2+ triggers)</td>
+                <td><span class="card-badge badge-danger">80%</span></td>
+                <td style="color:var(--accent-success); font-weight:600;">₹680</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Revenue Projection Chart -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📈 Weekly Revenue vs Claims Projection</div>
+          <span class="card-badge badge-success">Sustainable</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== AI INSIGHTS ==================== -->
+    <div class="section" id="section-ai">
+      <div class="section-header">
+        <h1 class="section-title">AI/ML Income Loss Prediction</h1>
+        <p class="section-desc">Machine learning model predicts disruption probability and expected income loss for the next 7 days.</p>
+      </div>
+
+      <!-- AI Model Info -->
+      <div class="card" style="margin-bottom:1.5rem; border-left: 3px solid var(--accent-primary);">
+        <div class="card-header">
+          <div class="card-title">🧠 Prediction Model Architecture</div>
+          <span class="card-badge badge-primary">ML Pipeline</span>
+        </div>
+        <div class="grid-4" style="margin-top:0.5rem;">
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">📥</div>
+            <div style="font-size:0.75rem; font-weight:600;">Input Features</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">Weather forecasts, AQI predictions, historical patterns, day-of-week</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">⚙️</div>
+            <div style="font-size:0.75rem; font-weight:600;">Model</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">Gradient Boosted Trees + LSTM for time-series patterns</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">📊</div>
+            <div style="font-size:0.75rem; font-weight:600;">Output</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">Risk level, predicted income loss, confidence score</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">🎯</div>
+            <div style="font-size:0.75rem; font-weight:600;">Accuracy</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">87% accuracy on historical data (simulated)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Partner Selector -->
+      <div style="margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem;">
+        <label style="color:var(--text-muted); font-size:0.85rem; font-weight:500;">Select Partner:</label>
+        <select class="form-select" id="aiPartnerSelect" onchange="updateAIPredictions()"></select>
+      </div>
+
+      <!-- Predictions -->
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📅 7-Day Income Forecast</div>
+            <span class="card-badge badge-warning">AI Predicted</span>
+          </div>
+          <div id="predictionsList"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📉 Predicted Income vs Normal</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="predictionChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Risk Heatmap -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🗺️ City-wide Risk Assessment</div>
+          <span class="card-badge badge-info">All Cities</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>City</th>
+              <th>Risk Tier</th>
+              <th>Rain Risk</th>
+              <th>Heat Risk</th>
+              <th>AQI Risk</th>
+              <th>Overall Risk</th>
+              <th>Predicted Weekly Claims</th>
+            </tr>
+          </thead>
+          <tbody id="riskTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>GigShield — DEVTrails 2026 | AI-Powered Parametric Insurance for India's Gig Workers</p>
+    <p style="margin-top:0.25rem; font-size:0.7rem;">Phase 1: Ideation & Foundation | Persona: Grocery & Q-Commerce</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
