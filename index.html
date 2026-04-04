@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GigShield — AI-Powered Parametric Insurance for Delivery Partners</title>
+  <meta name="description" content="Phase 2: Registration, Insurance Policy Management, Dynamic Premium Calculation, and Zero-Touch Claims for grocery delivery partners.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-logo">G</div>
+      <div>
+        <div class="navbar-title">GigShield</div>
+        <div class="navbar-subtitle">Parametric Insurance</div>
+      </div>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#" data-section="dashboard" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+      <li><a href="#" data-section="register"><span class="nav-icon">📝</span> Register</a></li>
+      <li><a href="#" data-section="policies"><span class="nav-icon">📋</span> Policies</a></li>
+      <li><a href="#" data-section="claims"><span class="nav-icon">🛡️</span> Claims</a></li>
+      <li><a href="#" data-section="premium-calc"><span class="nav-icon">🧮</span> Premium AI</a></li>
+      <li><a href="#" data-section="triggers"><span class="nav-icon">⚡</span> Triggers</a></li>
+      <li><a href="#" data-section="financial"><span class="nav-icon">💰</span> Financial</a></li>
+      <li><a href="#" data-section="ai"><span class="nav-icon">🤖</span> AI Insights</a></li>
+    </ul>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div class="section active" id="section-dashboard">
+      <div class="section-header">
+        <h1 class="section-title">Live Monitoring Dashboard</h1>
+        <p class="section-desc">Real-time environmental triggers, automated payouts, and zero-touch claims monitoring.</p>
+      </div>
+
+      <!-- City Selector -->
+      <div class="city-pills" id="cityPills"></div>
+
+      <!-- Stats Row -->
+      <div class="grid-4" id="dashboardStats" style="margin-bottom:1.5rem;">
+        <div class="stat-card">
+          <div class="stat-label">Registered Partners</div>
+          <div class="stat-value" id="statPartners">0</div>
+          <div class="stat-change positive" id="statPartnersChange">↑ 12% vs last week</div>
+          <div class="stat-icon">👥</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Policies</div>
+          <div class="stat-value" id="statPolicies">0</div>
+          <div class="stat-change positive" id="statPoliciesChange">All covered</div>
+          <div class="stat-icon">📋</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Auto-Claims Today</div>
+          <div class="stat-value" id="statClaims">0</div>
+          <div class="stat-change" id="claimStatus">Zero-touch payouts</div>
+          <div class="stat-icon">🛡️</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Paid Out</div>
+          <div class="stat-value" id="statPayouts">₹0</div>
+          <div class="stat-change positive" id="payoutCount">0 auto-payouts</div>
+          <div class="stat-icon">💸</div>
+        </div>
+      </div>
+
+      <!-- Live Trigger Monitor -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header">
+          <div class="card-title">📡 Live API Trigger Monitor (5 Sources)</div>
+          <span class="card-badge badge-info"><span class="live-dot"></span> Monitoring</span>
+        </div>
+        <div class="grid-5" id="triggerMonitorGrid"></div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌧️ Weather & AQI (7-Day)</div>
+            <span class="card-badge badge-info"><span class="live-dot"></span> Live</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="weatherChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📉 Income Impact Analysis</div>
+            <span class="card-badge badge-warning">This Week</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="incomeChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Alerts & Recent Claims -->
+      <div class="grid-2-1">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🚨 Active Trigger Alerts</div>
+            <span class="card-badge badge-danger" id="alertCount">0 Active</span>
+          </div>
+          <div id="alertsList">
+            <p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:2rem;">
+              No active triggers. Click "Simulate Disruption" to test the engine.
+            </p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💳 Recent Auto-Claims</div>
+          </div>
+          <div id="recentPayoutsList"></div>
+        </div>
+      </div>
+
+      <!-- Simulation Panel -->
+      <div class="sim-panel" id="simPanel">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h3 style="font-size:1rem; font-weight:600; margin-bottom:0.25rem;">⚡ Disruption Simulator</h3>
+            <p style="color:var(--text-muted); font-size:0.8rem;">Simulate environmental disruptions — triggers auto-file zero-touch claims</p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-danger" onclick="simulateDisruption('monsoon')">🌧️ Monsoon</button>
+            <button class="btn btn-danger" onclick="simulateDisruption('heatwave')">🌡️ Heatwave</button>
+            <button class="btn btn-danger" onclick="simulateDisruption('pollution')">💨 AQI Spike</button>
+            <button class="btn btn-outline" onclick="resetSimulation()">↺ Reset</button>
+          </div>
+        </div>
+        <div class="sim-result" id="simResult"></div>
+      </div>
+    </div>
+
+    <!-- ==================== REGISTRATION ==================== -->
+    <div class="section" id="section-register">
+      <div class="section-header">
+        <h1 class="section-title">Partner Registration</h1>
+        <p class="section-desc">Quick 4-step registration to get instant parametric insurance coverage. Join 2,800+ protected delivery partners.</p>
+      </div>
+
+      <!-- Stepper -->
+      <div class="stepper" id="regStepper">
+        <div class="stepper-step active" data-step="1">
+          <div class="stepper-num">1</div>
+          <div class="stepper-label">Personal Info</div>
+        </div>
+        <div class="stepper-line active"></div>
+        <div class="stepper-step" data-step="2">
+          <div class="stepper-num">2</div>
+          <div class="stepper-label">Work Profile</div>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-step" data-step="3">
+          <div class="stepper-num">3</div>
+          <div class="stepper-label">Choose Plan</div>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-step" data-step="4">
+          <div class="stepper-num">4</div>
+          <div class="stepper-label">Confirmation</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Personal Info -->
+      <div class="reg-step active" id="regStep1">
+        <div class="card" style="max-width:600px; margin:0 auto;">
+          <div class="card-header">
+            <div class="card-title">👤 Personal Information</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" class="form-input" id="regName" placeholder="Enter your full name" style="width:100%;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input type="tel" class="form-input" id="regPhone" placeholder="10-digit mobile number" style="width:100%;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Aadhaar Number *</label>
+            <input type="text" class="form-input" id="regAadhaar" placeholder="XXXX XXXX XXXX" style="width:100%;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Age *</label>
+            <input type="number" class="form-input" id="regAge" placeholder="Your age" min="18" max="65" style="width:100%;">
+          </div>
+          <div class="form-actions">
+            <div></div>
+            <button class="btn btn-primary" onclick="regNextStep(2)">Next → Work Profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Work Profile -->
+      <div class="reg-step" id="regStep2">
+        <div class="card" style="max-width:600px; margin:0 auto;">
+          <div class="card-header">
+            <div class="card-title">🛵 Work Profile</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">City *</label>
+            <select class="form-select" id="regCity" onchange="updateRegZones()" style="width:100%;"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Delivery Zone *</label>
+            <select class="form-select" id="regZone" style="width:100%;"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Platform *</label>
+            <select class="form-select" id="regPlatform" style="width:100%;"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Vehicle Type *</label>
+            <select class="form-select" id="regVehicle" style="width:100%;"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Average Daily Income (₹) *</label>
+            <input type="number" class="form-input" id="regIncome" placeholder="e.g. 800" style="width:100%;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Average Orders per Day</label>
+            <input type="number" class="form-input" id="regOrders" placeholder="e.g. 18" style="width:100%;">
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-outline" onclick="regNextStep(1)">← Back</button>
+            <button class="btn btn-primary" onclick="regNextStep(3)">Next → Choose Plan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Plan Selection -->
+      <div class="reg-step" id="regStep3">
+        <div class="card" style="max-width:900px; margin:0 auto;">
+          <div class="card-header">
+            <div class="card-title">📋 Choose Your Insurance Plan</div>
+            <span class="card-badge badge-info">Dynamic Pricing Active</span>
+          </div>
+          <div class="grid-3" id="planCards" style="margin-top:1rem;"></div>
+          <div id="premiumBreakdownPanel" style="margin-top:1.5rem;"></div>
+          <div class="form-actions" style="margin-top:1.5rem;">
+            <button class="btn btn-outline" onclick="regNextStep(2)">← Back</button>
+            <button class="btn btn-primary" onclick="regNextStep(4)" id="regSubmitBtn">Register & Activate Policy →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Confirmation -->
+      <div class="reg-step" id="regStep4">
+        <div class="card confirmation-card" style="max-width:600px; margin:0 auto; text-align:center;">
+          <div class="confirmation-icon">✅</div>
+          <h2 style="font-size:1.5rem; font-weight:700; margin-bottom:0.5rem;">Registration Successful!</h2>
+          <p style="color:var(--text-secondary); margin-bottom:1.5rem;">You're now protected by GigShield parametric insurance.</p>
+          <div id="confirmationDetails"></div>
+          <div class="form-actions" style="justify-content:center; margin-top:1.5rem;">
+            <button class="btn btn-primary" onclick="navigateTo('policies')">View My Policy →</button>
+            <button class="btn btn-outline" onclick="resetRegistration()">Register Another Partner</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== POLICY MANAGEMENT ==================== -->
+    <div class="section" id="section-policies">
+      <div class="section-header">
+        <h1 class="section-title">Insurance Policy Management</h1>
+        <p class="section-desc">View, manage, and renew your active insurance policies. All policies include zero-touch automated claims.</p>
+      </div>
+
+      <!-- Policy Stats -->
+      <div class="grid-4" style="margin-bottom:1.5rem;">
+        <div class="stat-card">
+          <div class="stat-label">Total Policies</div>
+          <div class="stat-value" id="polTotalCount">0</div>
+          <div class="stat-icon">📋</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Policies</div>
+          <div class="stat-value" id="polActiveCount">0</div>
+          <div class="stat-change positive">Protected</div>
+          <div class="stat-icon">✅</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Premium</div>
+          <div class="stat-value" id="polAvgPremium">₹0</div>
+          <div class="stat-change positive">Per week</div>
+          <div class="stat-icon">💰</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Coverage</div>
+          <div class="stat-value" id="polTotalCoverage">₹0</div>
+          <div class="stat-change positive">Max payout/week</div>
+          <div class="stat-icon">🛡️</div>
+        </div>
+      </div>
+
+      <!-- Policy Cards Grid -->
+      <div id="policyCardsContainer"></div>
+    </div>
+
+    <!-- ==================== CLAIMS MANAGEMENT ==================== -->
+    <div class="section" id="section-claims">
+      <div class="section-header">
+        <h1 class="section-title">Zero-Touch Claims Management</h1>
+        <p class="section-desc">Automated claims filed, verified, and paid within minutes — no paperwork, no waiting.</p>
+      </div>
+
+      <!-- Claims Stats -->
+      <div class="grid-4" style="margin-bottom:1.5rem;">
+        <div class="stat-card">
+          <div class="stat-label">Total Claims</div>
+          <div class="stat-value" id="clmTotalCount">0</div>
+          <div class="stat-icon">📊</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Claims Paid</div>
+          <div class="stat-value" id="clmPaidCount">0</div>
+          <div class="stat-change positive">100% auto-processed</div>
+          <div class="stat-icon">✅</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Paid Amount</div>
+          <div class="stat-value" id="clmTotalAmount">₹0</div>
+          <div class="stat-icon">💸</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Processing Time</div>
+          <div class="stat-value" id="clmAvgTime">0 min</div>
+          <div class="stat-change positive">Zero-touch</div>
+          <div class="stat-icon">⏱️</div>
+        </div>
+      </div>
+
+      <!-- Claims Pipeline -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header">
+          <div class="card-title">🔄 Claim Processing Pipeline</div>
+          <span class="card-badge badge-success">Fully Automated</span>
+        </div>
+        <div class="claim-pipeline">
+          <div class="pipeline-stage">
+            <div class="pipeline-icon" style="background:rgba(59,130,246,0.2); color:#3b82f6;">📡</div>
+            <div class="pipeline-label">API Trigger<br>Detected</div>
+            <div class="pipeline-time">0 sec</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-stage">
+            <div class="pipeline-icon" style="background:rgba(245,158,11,0.2); color:#f59e0b;">🔍</div>
+            <div class="pipeline-label">Data<br>Verification</div>
+            <div class="pipeline-time">~15 sec</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-stage">
+            <div class="pipeline-icon" style="background:rgba(99,102,241,0.2); color:#6366f1;">✅</div>
+            <div class="pipeline-label">Policy<br>Matching</div>
+            <div class="pipeline-time">~30 sec</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-stage">
+            <div class="pipeline-icon" style="background:rgba(16,185,129,0.2); color:#10b981;">💰</div>
+            <div class="pipeline-label">Amount<br>Calculated</div>
+            <div class="pipeline-time">~45 sec</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-stage">
+            <div class="pipeline-icon" style="background:rgba(16,185,129,0.3); color:#10b981;">💸</div>
+            <div class="pipeline-label">Auto-Paid<br>to UPI</div>
+            <div class="pipeline-time">~2 min</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claims Chart + List -->
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Claims by Trigger Type</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="claimsChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💰 Claims Amount Distribution</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="claimsAmountChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claims Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 All Claims</div>
+          <span class="card-badge badge-info" id="claimsTableCount">0 Claims</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Claim ID</th>
+                <th>Partner</th>
+                <th>Trigger</th>
+                <th>Value</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Processing</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="claimsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== DYNAMIC PREMIUM CALCULATOR ==================== -->
+    <div class="section" id="section-premium-calc">
+      <div class="section-header">
+        <h1 class="section-title">AI-Powered Dynamic Premium Engine</h1>
+        <p class="section-desc">Machine learning model adjusts weekly premiums based on hyper-local risk factors, zone safety history, and predictive weather modeling.</p>
+      </div>
+
+      <!-- ML Model Info -->
+      <div class="card" style="margin-bottom:1.5rem; border-left: 3px solid var(--accent-primary);">
+        <div class="card-header">
+          <div class="card-title">🧠 ML Pricing Model</div>
+          <span class="card-badge badge-primary">5 Risk Factors</span>
+        </div>
+        <div class="grid-5" style="margin-top:0.5rem;">
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">🏙️</div>
+            <div style="font-size:0.75rem; font-weight:600;">City Risk Tier</div>
+            <div style="font-size:0.65rem; color:var(--text-muted); margin-top:0.25rem;">Base premium by city hazard profile</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">📍</div>
+            <div style="font-size:0.75rem; font-weight:600;">Zone Safety</div>
+            <div style="font-size:0.65rem; color:var(--text-muted); margin-top:0.25rem;">₹2-5 discount for waterlog-safe zones</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">📅</div>
+            <div style="font-size:0.75rem; font-weight:600;">Seasonal Adj.</div>
+            <div style="font-size:0.65rem; color:var(--text-muted); margin-top:0.25rem;">Monsoon/winter AQI surcharges</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">📈</div>
+            <div style="font-size:0.75rem; font-weight:600;">Claims History</div>
+            <div style="font-size:0.65rem; color:var(--text-muted); margin-top:0.25rem;">Frequency-based load factor</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">🌦️</div>
+            <div style="font-size:0.75rem; font-weight:600;">Weather Predict</div>
+            <div style="font-size:0.65rem; color:var(--text-muted); margin-top:0.25rem;">Extra coverage for high-risk forecasts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Calculator -->
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🧮 Premium Calculator</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <select class="form-select" id="calcCity" onchange="updatePremiumCalc()" style="width:100%;"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Delivery Zone</label>
+            <select class="form-select" id="calcZone" onchange="updatePremiumCalc()" style="width:100%;"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Insurance Plan</label>
+            <select class="form-select" id="calcPlan" onchange="updatePremiumCalc()" style="width:100%;">
+              <option value="basic">🛡️ GigShield Basic</option>
+              <option value="standard" selected>⚡ GigShield Pro</option>
+              <option value="premium">💎 GigShield Ultra</option>
+            </select>
+          </div>
+        </div>
+        <div class="card" id="calcResultCard">
+          <div class="gauge-container">
+            <div class="gauge-value" id="calcPremiumResult">₹0</div>
+            <div class="gauge-label">Weekly Premium</div>
+          </div>
+          <div id="calcBreakdown" style="margin-top:1rem;"></div>
+        </div>
+      </div>
+
+      <!-- Premium Comparison Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 City-Zone Premium Comparison</div>
+          <span class="card-badge badge-primary">ML-Optimized</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>City</th>
+                <th>Risk Tier</th>
+                <th>Zone</th>
+                <th>Safe Zone?</th>
+                <th>Basic</th>
+                <th>Pro</th>
+                <th>Ultra</th>
+                <th>Savings</th>
+              </tr>
+            </thead>
+            <tbody id="premiumComparisonTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TRIGGER ENGINE ==================== -->
+    <div class="section" id="section-triggers">
+      <div class="section-header">
+        <h1 class="section-title">5-Source Parametric Trigger Engine</h1>
+        <p class="section-desc">Automated trigger-based payouts from 5 independent data sources — no manual claims, no paperwork.</p>
+      </div>
+
+      <!-- How It Works -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header">
+          <div class="card-title">🔄 Zero-Touch Claim Flow</div>
+          <span class="card-badge badge-primary">Fully Automated</span>
+        </div>
+        <div class="flow-container">
+          <div class="flow-step active">
+            <div class="flow-icon">🌦️</div>
+            <div class="flow-label">5 APIs stream data 24/7</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">📡</div>
+            <div class="flow-label">Threshold breach detected</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">🔍</div>
+            <div class="flow-label">Auto-verify partner was online</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">💰</div>
+            <div class="flow-label">Calculate payout amount</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">💸</div>
+            <div class="flow-label">Instant UPI payout</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">
+            <div class="flow-icon">📱</div>
+            <div class="flow-label">SMS + App notification</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trigger Configurations -->
+      <h3 style="font-size:1rem; font-weight:600; margin-bottom:1rem; color:var(--text-secondary);">Trigger Thresholds & API Sources</h3>
+      <div class="grid-3" style="margin-bottom:1.5rem;" id="triggerCards"></div>
+
+      <!-- Trigger History Chart + Payout Log -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Trigger History (7 Days)</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="triggerHistoryChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 Recent Payout Log</div>
+            <span class="card-badge badge-success">Auto-processed</span>
+          </div>
+          <div id="payoutLog" style="max-height:280px; overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FINANCIAL MODEL ==================== -->
+    <div class="section" id="section-financial">
+      <div class="section-header">
+        <h1 class="section-title">Weekly Financial Model</h1>
+        <p class="section-desc">Premium pricing, coverage pool, and payout structure tailored for gig worker weekly pay cycles.</p>
+      </div>
+
+      <!-- Premium Calculator -->
+      <div class="grid-3" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="gauge-container">
+            <div class="gauge-value" id="premiumValue">₹89</div>
+            <div class="gauge-label">Weekly Premium</div>
+          </div>
+          <div style="text-align:center; margin-top:0.5rem;">
+            <label style="color:var(--text-muted); font-size:0.75rem; display:block; margin-bottom:0.5rem;">Select City</label>
+            <select class="form-select" id="citySelect" onchange="updateFinancialModel()" style="width:100%;"></select>
+          </div>
+        </div>
+        <div class="card">
+          <div class="gauge-container">
+            <div class="gauge-value" id="poolValue">₹0</div>
+            <div class="gauge-label">Weekly Pool Size</div>
+          </div>
+          <div style="text-align:center; margin-top:0.5rem; color:var(--text-muted); font-size:0.8rem;">
+            Premium income + 30% platform co-pay
+          </div>
+        </div>
+        <div class="card">
+          <div class="gauge-container">
+            <div class="gauge-value">₹4,000</div>
+            <div class="gauge-label">Max Weekly Payout</div>
+          </div>
+          <div style="text-align:center; margin-top:0.5rem; color:var(--text-muted); font-size:0.8rem;">
+            Per delivery partner cap (Ultra plan)
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Breakdown -->
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Premium Tiers by City Risk</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>City</th>
+                <th>Risk Tier</th>
+                <th>Weekly Premium</th>
+                <th>Daily Cost</th>
+                <th>Claim Rate</th>
+              </tr>
+            </thead>
+            <tbody id="premiumTable"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💰 Payout Structure</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Trigger</th>
+                <th>API Source</th>
+                <th>Payout %</th>
+                <th>Max Payout</th>
+              </tr>
+            </thead>
+            <tbody id="payoutStructureTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Revenue Projection Chart -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📈 Weekly Revenue vs Claims Projection</div>
+          <span class="card-badge badge-success">Sustainable</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== AI INSIGHTS ==================== -->
+    <div class="section" id="section-ai">
+      <div class="section-header">
+        <h1 class="section-title">AI/ML Income Loss Prediction</h1>
+        <p class="section-desc">Machine learning model predicts disruption probability and expected income loss for the next 7 days.</p>
+      </div>
+
+      <!-- AI Model Info -->
+      <div class="card" style="margin-bottom:1.5rem; border-left: 3px solid var(--accent-primary);">
+        <div class="card-header">
+          <div class="card-title">🧠 Prediction Model Architecture</div>
+          <span class="card-badge badge-primary">ML Pipeline</span>
+        </div>
+        <div class="grid-4" style="margin-top:0.5rem;">
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">📥</div>
+            <div style="font-size:0.75rem; font-weight:600;">Input Features</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">Weather, AQI, historical, zone data</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">⚙️</div>
+            <div style="font-size:0.75rem; font-weight:600;">Model</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">GBT + LSTM time-series</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">📊</div>
+            <div style="font-size:0.75rem; font-weight:600;">Output</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">Risk level, income loss, confidence</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; margin-bottom:0.25rem;">🎯</div>
+            <div style="font-size:0.75rem; font-weight:600;">Accuracy</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">87% on historical data</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Partner Selector -->
+      <div style="margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem;">
+        <label style="color:var(--text-muted); font-size:0.85rem; font-weight:500;">Select Partner:</label>
+        <select class="form-select" id="aiPartnerSelect" onchange="updateAIPredictions()"></select>
+      </div>
+
+      <!-- Predictions -->
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📅 7-Day Income Forecast</div>
+            <span class="card-badge badge-warning">AI Predicted</span>
+          </div>
+          <div id="predictionsList"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📉 Predicted Income vs Normal</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="predictionChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Risk Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🗺️ City-wide Risk Assessment</div>
+          <span class="card-badge badge-info">All Cities</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>City</th>
+              <th>Risk Tier</th>
+              <th>Rain Risk</th>
+              <th>Heat Risk</th>
+              <th>AQI Risk</th>
+              <th>Overall Risk</th>
+              <th>Predicted Weekly Claims</th>
+            </tr>
+          </thead>
+          <tbody id="riskTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claim Detail Modal -->
+  <div class="modal-overlay" id="claimModal">
+    <div class="modal-content">
+      <div class="modal-close" onclick="closeClaimModal()">✕</div>
+      <div id="claimModalBody"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>GigShield — DEVTrails 2026 | AI-Powered Parametric Insurance for India's Gig Workers</p>
+    <p style="margin-top:0.25rem; font-size:0.7rem;">Phase 2: Automation & Protection | Zero-Touch Claims • Dynamic Pricing • 5-Source Triggers</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="app2.js"></script>
+  <script src="app3.js"></script>
+  <script src="app4.js"></script>
+</body>
+</html>
